@@ -43,11 +43,21 @@ namespace sELedit
 		public bool load(ColorProgressBar.ColorProgressBar cpb2, System.Windows.Forms.Control invokeControl)
         {
             // Initialize progress bar on UI thread
-            invokeControl.Invoke((System.Windows.Forms.MethodInvoker)delegate {
+            if (invokeControl.IsHandleCreated)
+            {
+                invokeControl.Invoke((System.Windows.Forms.MethodInvoker)delegate {
+                    cpb2.Maximum = 10;
+                    cpb2.Minimum = 0;
+                    cpb2.Value = 0;
+                });
+            }
+            else
+            {
+                // If handle not created yet, just set values directly
                 cpb2.Maximum = 10;
                 cpb2.Minimum = 0;
                 cpb2.Value = 0;
-            });
+            }
 
             firstLoad = true;
             
@@ -91,10 +101,19 @@ namespace sELedit
         
         private void UpdateProgress(ColorProgressBar.ColorProgressBar cpb2, System.Windows.Forms.Control invokeControl)
         {
-            invokeControl.Invoke((System.Windows.Forms.MethodInvoker)delegate {
+            if (invokeControl.IsHandleCreated)
+            {
+                invokeControl.Invoke((System.Windows.Forms.MethodInvoker)delegate {
+                    cpb2.Value++;
+                    System.Windows.Forms.Application.DoEvents();
+                });
+            }
+            else
+            {
+                // If handle not created yet, just update value directly
+                // This is safe because we're still in form initialization
                 cpb2.Value++;
-                System.Windows.Forms.Application.DoEvents();
-            });
+            }
         }
 
         public void imagsTask()
@@ -342,7 +361,7 @@ namespace sELedit
                                 {
                                     item_desc.Add(i, data[0])/*, data[1].ToString().Replace('"', ' ')*/;
                                 }
-                            catch (Exception e) { MessageBox.Show(e.Message); }
+                            catch (Exception e) { /* Log error instead of showing MessageBox from background thread */ }
                             }
                          
                     }
@@ -430,17 +449,20 @@ namespace sELedit
                             }
                             catch (Exception e)
                             {
-                                MessageBox.Show("ERROR LOADING ITEM DESCRIPTION LIST\n" + e.Message);
+                                // Log error instead of showing MessageBox from background thread
+                                System.Diagnostics.Debug.WriteLine("ERROR LOADING ITEM DESCRIPTION LIST: " + e.Message);
                             }
                         }
                         else
                         {
-                            MessageBox.Show("NOT FOUND item_ext_desc.txt!");
+                            // Log error instead of showing MessageBox from background thread
+                            System.Diagnostics.Debug.WriteLine("NOT FOUND item_ext_desc.txt!");
                         }
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("ERROR LOADING ITEM DESCRIPTION LIST\n" + ex.Message);
+                        // Log error instead of showing MessageBox from background thread
+                        System.Diagnostics.Debug.WriteLine("ERROR LOADING ITEM DESCRIPTION LIST: " + ex.Message);
                     }
                 }
                 else
@@ -491,7 +513,8 @@ namespace sELedit
                         }
                         else
                         {
-                            MessageBox.Show("Unable to load thumbnails...");
+                            // Log error instead of showing MessageBox from background thread
+                            System.Diagnostics.Debug.WriteLine("Unable to load thumbnails...");
                             //sourceBitmap = (Bitmap)Image.FromFile(Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\surfaces\\iconset\\iconlist_ivtrm.png");
                         }
                     }
@@ -618,12 +641,14 @@ namespace sELedit
                         }
                         catch (Exception e)
                         {
-                            MessageBox.Show("ERROR LOADING SKILL LIST\n" + e.Message);
+                            // Log error instead of showing MessageBox from background thread
+                            System.Diagnostics.Debug.WriteLine("ERROR LOADING SKILL LIST: " + e.Message);
                         }
                     }
                     else
                     {
-                        MessageBox.Show("NOT FOUND localization\\skillstr.txt!");
+                        // Log error instead of showing MessageBox from background thread
+                        System.Diagnostics.Debug.WriteLine("NOT FOUND localization\\skillstr.txt!");
                     }
                     database.skillstr = MainWindow.skillstr;
                 }
@@ -680,7 +705,8 @@ namespace sELedit
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("ERROR LOADING ADDON LIST\n" + e.Message);
+                    // Log error instead of showing MessageBox from background thread
+                    System.Diagnostics.Debug.WriteLine("ERROR LOADING ADDON LIST: " + e.Message);
                 }
             }
             // If file doesn't exist, just use empty list
@@ -714,7 +740,8 @@ namespace sELedit
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("ERROR LOADING LOCALIZATION\n" + e.Message);
+                    // Log error instead of showing MessageBox from background thread
+                    System.Diagnostics.Debug.WriteLine("ERROR LOADING LOCALIZATION: " + e.Message);
                 }
             }
             // If file doesn't exist, just use empty list
@@ -810,12 +837,14 @@ namespace sELedit
                         }
                         catch (Exception e)
                         {
-                            MessageBox.Show("ERROR LOADING BUFF LIST\n" + e.Message);
+                            // Log error instead of showing MessageBox from background thread
+                            System.Diagnostics.Debug.WriteLine("ERROR LOADING BUFF LIST: " + e.Message);
                         }
                     }
                     else
                     {
-                        MessageBox.Show("NOT FOUND localization\\skillstr.txt!");
+                        // Log error instead of showing MessageBox from background thread
+                        System.Diagnostics.Debug.WriteLine("NOT FOUND localization\\skillstr.txt!");
                     }
                     database.skillstr = MainWindow.skillstr;
                 }
