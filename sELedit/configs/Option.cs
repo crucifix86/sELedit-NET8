@@ -110,7 +110,7 @@ namespace sELedit
                     ElementsIsLoading = true;
                     Elem = LBLIBRARY.PWHelper.ReadElements(ElementsPath, Application.StartupPath, true);
                     Main_form.Elem = Elem;
-                    Main_form.ElementsLoaded(false);
+                    Main_form.ElementsLoaded = false;
                     if (Elem != null && SurfacesPck != null)
                     {
                         List<LBLIBRARY.PWHelper.Icon> d = null;
@@ -123,7 +123,7 @@ namespace sELedit
                             d = LBLIBRARY.PWHelper.LoadIconList(Elem, SurfacesPck);
                             SurfacesPck.Dispose();
                         }
-                        Main_form.ElementsLoaded(true);
+                        Main_form.ElementsLoaded = true;
                     }
                     ElementsIsLoading = false;
                 }

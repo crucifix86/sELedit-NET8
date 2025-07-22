@@ -68,7 +68,7 @@ namespace sELedit
         {
            if (Surfaces_icons.Count >= Index + 1)
            {
-               Main_form.SetShopIconImage(Surfaces_icons[Index].Name, Surfaces_icons[Index].Icon);
+               Main_form.SetShopIconImage(Surfaces_icons[Index].Icon, Surfaces_icons[Index].Name);
                this.Hide();
            }
         }
