@@ -253,6 +253,8 @@ namespace sELedit
                     byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
 
                     string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\configs\item_color.txt";
+                    string tempDir = Path.GetDirectoryName(tempFileName);
+                    Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFileName, array);
                     var item_color_Read = File.ReadAllLines(tempFileName, Encoding.GetEncoding("GBK"));
 
@@ -361,6 +363,8 @@ namespace sELedit
                     byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
                    // var sd = pck.
                     string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\configs\item_desc.txt";
+                    string tempDir = Path.GetDirectoryName(tempFileName);
+                    Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFileName, array);
                     var item_desc_Read = File.ReadAllLines(tempFileName, Encoding.GetEncoding("GBK"));
 
@@ -439,6 +443,8 @@ namespace sELedit
                         byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
 
                         string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\configs\item_ext_desc.txt";
+                        string tempDir = Path.GetDirectoryName(tempFileName);
+                        Directory.CreateDirectory(tempDir);
                         File.WriteAllBytes(tempFileName, array);
                         var item_ext_desc_Read = File.ReadAllLines(tempFileName, Encoding.GetEncoding("GBK"));
 
@@ -569,17 +575,14 @@ namespace sELedit
                         {
                             sourceBitmap = bmp2;
                             string tempFileName_img = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\surfaces\iconset\iconlist_ivtrm.dds";
+                            string tempDir_img = Path.GetDirectoryName(tempFileName_img);
+                            Directory.CreateDirectory(tempDir_img);
                             if (File.Exists(tempFileName_img))
                             {
                                 File.Delete(tempFileName_img);
-                                bmp2.Save(tempFileName_img);
-                                bmp2.Save(tempFileName_img.Replace(Path.GetExtension(tempFileName_img), ".png"), ImageFormat.Png);
                             }
-                            else
-                            {
-                                bmp2.Save(tempFileName_img);
-                                bmp2.Save(tempFileName_img.Replace(Path.GetExtension(tempFileName_img), ".png"), ImageFormat.Png);
-                            }
+                            bmp2.Save(tempFileName_img);
+                            bmp2.Save(tempFileName_img.Replace(Path.GetExtension(tempFileName_img), ".png"), ImageFormat.Png);
                         }
                         else
                         {
@@ -600,6 +603,8 @@ namespace sELedit
                     byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
 
                     string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\surfaces\iconset\iconlist_ivtrm.txt";
+                    string tempDir = Path.GetDirectoryName(tempFileName);
+                    Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFileName, array);
                     var iconlist_ivtrm_Read = File.ReadAllLines(tempFileName, Encoding.GetEncoding("GBK"));
 
@@ -692,6 +697,8 @@ namespace sELedit
                     byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
 
                     string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\configs\skillstr.txt";
+                    string tempDir = Path.GetDirectoryName(tempFileName);
+                    Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFileName, array);
                     var skillstr_Read = File.ReadAllLines(tempFileName, Encoding.GetEncoding("GBK"));
                     string result = string.Join("\n", skillstr_Read);
@@ -907,6 +914,8 @@ namespace sELedit
                     byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
 
                     string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\configs\buff_str.txt";
+                    string tempDir = Path.GetDirectoryName(tempFileName);
+                    Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFileName, array);
                     var buff_str_Read = File.ReadAllLines(tempFileName, Encoding.GetEncoding("GBK"));
                     string result = string.Join("\n", buff_str_Read);
