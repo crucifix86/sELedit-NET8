@@ -661,101 +661,21 @@ namespace sELedit
                 }
                 else
                 {
-                    string sourceFilename = Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\surfaces\\iconset\\iconlist_ivtrm.png";
-
-                    string extension = Path.GetExtension(sourceFilename);
-                    if (extension == ".dds")
-                    {
-                        DDSReader.Utils.PixelFormat st = (DDSReader.Utils.PixelFormat)DDSFORMAT;
-                        Bitmap bmp = DDSReader.DDS.LoadImage(sourceFilename, true, st);
-                        if (bmp != null)
-                        {
-                            sourceBitmap = bmp;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Unable to load thumbnails...");
-                            //sourceBitmap = (Bitmap)Image.FromFile(Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\surfaces\\iconset\\iconlist_ivtrm.png");
-                        }
-                    }
-                    else
-                    {
-                        sourceBitmap = (Bitmap)Image.FromFile(sourceFilename);
-                    }
-                    if (sourceBitmap == null)
-                    {
-                        MessageBox.Show("Unable to load dds image...");
-                        sourceBitmap = (Bitmap)Image.FromFile(Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\surfaces\\iconset\\iconlist_ivtrm.png");
-                    }
+                    // No surfaces.pck file available - return empty data
+                    sourceBitmap = null;
                     database.sourceBitmap = sourceBitmap;
-                    SortedList<string, Bitmap> results = new SortedList<string, Bitmap>();
-                    List<Bitmap> zxczxc = new List<Bitmap>();
-                    List<string> fileNames = new List<string>();
-
                     imagesx = new SortedList<int, string>();
-                    int w = 0;
-                    int h = 0;
-
-                    int counter = 0;
-                    string line;
-                    string iconlist_ivtrm = Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\surfaces\\iconset\\iconlist_ivtrm.txt";
-                    Encoding enc = Encoding.GetEncoding("GBK");
-                    StreamReader file = null;
-                    string extension2 = Path.GetExtension(iconlist_ivtrm);
-                    file = new StreamReader(iconlist_ivtrm, enc);
-                    LP.preg_max = iconlist_ivtrm.Length;
-                    int ct = 0;
-                    while ((line = file.ReadLine()) != null)
-                    {
-                        LP.preg = ct;ct++;
-                        switch (counter)
-                        {
-                            case 0:
-                                w = int.Parse(line);
-                                break;
-                            case 1:
-                                h = int.Parse(line);
-                                break;
-                            case 2:
-                                rows = int.Parse(line);
-                                database.rows = rows;
-                                break;
-                            case 3:
-                                cols = int.Parse(line);
-                                database.cols = cols;
-                                break;
-                            default:
-                                fileNames.Add(line);
-                                break;
-                        }
-                        counter++;
-                    }
-                    file.Close();
                     imageposition = new SortedList<string, Point>();
-                    int x, y = 0;
-                    LP.preg_max = fileNames.Count;
-                    for (int a = 0; a < fileNames.Count; a++)
-                    {
-                        Application.DoEvents();
-                        y = a / cols;
-                        x = a - y * cols;
-                        x = x * w;
-                        y = y * h;
-                        try
-                        {
-                            LP.preg = a;
-                            imagesx.Add(a, fileNames[a]);
-                            imageposition.Add(fileNames[a], new Point(x, y));
-                        }
-                        catch (Exception) { }
-
-                    }
+                    database.imagesx = imagesx;
+                    database.imageposition = imageposition;
+                    database.rows = 0;
+                    database.cols = 0;
+                    
+                    // Don't show message here as it may be called during initial load
+                    // The user will configure paths through the settings dialog
+                    return imageposition;
                 }
 
-                database.imagesx = imagesx;
-                database.imageposition = imageposition;
-                return imageposition;
-           
 			
 
             
