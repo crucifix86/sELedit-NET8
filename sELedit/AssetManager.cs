@@ -26,6 +26,23 @@ namespace sELedit
         private SortedList<string, Point> imageposition;
         private SortedList<int, string> item_desc;
         public SortedList item_ext_desc;
+        
+        // Get the correct base directory for the application
+        private static string GetBaseDirectory()
+        {
+            // In .NET 8, we need to get the directory where the executable is located
+            string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string baseDir = Path.GetDirectoryName(exePath);
+            
+            // If we're in a Debug/Release subfolder, go up to the project root
+            if (baseDir.EndsWith(@"\Debug\net8.0-windows") || baseDir.EndsWith(@"\Release\net8.0-windows"))
+            {
+                // Go up 2 directories to get to the actual project directory
+                baseDir = Directory.GetParent(Directory.GetParent(baseDir).FullName).FullName;
+            }
+            
+            return baseDir;
+        }
 
         public static SortedList _wepon;
 		public static SortedList _armor;
@@ -122,18 +139,20 @@ namespace sELedit
 			try
 			{
 				ImageList imageList1 = new ImageList();
-				string[] arquivos = Directory.GetFiles(Application.StartupPath + @"\images", "*.png", SearchOption.TopDirectoryOnly);
-				for (int fd = 0; fd < arquivos.Length; fd++)
+				string imagesPath = Path.Combine(GetBaseDirectory(), "images");
+				if (Directory.Exists(imagesPath))
 				{
-					imageList1.Images.Add(Image.FromFile(arquivos[fd]));
-
+					string[] arquivos = Directory.GetFiles(imagesPath, "*.png", SearchOption.TopDirectoryOnly);
+					for (int fd = 0; fd < arquivos.Length; fd++)
+					{
+						imageList1.Images.Add(Image.FromFile(arquivos[fd]));
+					}
 				}
 				MainWindow.database.ImageTask = imageList1;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-
-			
+				System.Diagnostics.Debug.WriteLine($"Failed to load task images: {ex.Message}");
 			}
 			
 			
@@ -142,10 +161,11 @@ namespace sELedit
 
 		public void addons_wac()
 		{
-			string wp = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\opt\add_wepom.txt";
-			string am = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\opt\add_armor.txt";
-			string dec = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\opt\add_decoration.txt";
-			string st = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\opt\add_suite.txt";
+			string baseDir = GetBaseDirectory();
+			string wp = Path.Combine(baseDir, @"resources\opt\add_wepom.txt");
+			string am = Path.Combine(baseDir, @"resources\opt\add_armor.txt");
+			string dec = Path.Combine(baseDir, @"resources\opt\add_decoration.txt");
+			string st = Path.Combine(baseDir, @"resources\opt\add_suite.txt");
 			string[] lines_w = File.Exists(wp) ? File.ReadAllLines(wp) : new string[0];
 			string[] lines_a = File.Exists(am) ? File.ReadAllLines(am) : new string[0];
 			string[] lines_d = File.Exists(dec) ? File.ReadAllLines(dec) : new string[0];
@@ -230,7 +250,7 @@ namespace sELedit
             {
                 string line;
                 arrTheme = new List<string>();
-                string theme_list = Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\theme.txt";
+                string theme_list = Path.Combine(GetBaseDirectory(), @"resources\theme.txt");
                 Encoding enc = Encoding.GetEncoding("GBK");
                 int lines = File.ReadAllLines(theme_list).Length;
                 StreamReader file = new StreamReader(theme_list, enc);
@@ -274,7 +294,7 @@ namespace sELedit
                     IEnumerable<PCKFileEntry> source = pck.Files.Where<PCKFileEntry>((Func<PCKFileEntry, bool>)(i => i.Path.StartsWith("configs\\item_color.txt")));
                     byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
 
-                    string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\configs\item_color.txt";
+                    string tempFileName = GetBaseDirectory() + @"\" + @"resources\configs\item_color.txt";
                     string tempDir = Path.GetDirectoryName(tempFileName);
                     Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFileName, array);
@@ -324,10 +344,13 @@ namespace sELedit
                     loaditem_desc();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                ErrorHandler.ShowErrorWithClipboard("Failed to load item colors", ex);
+                // Continue with empty data
+                item_color = new SortedList<int, int>();
+                database.item_color = item_color;
+                loaditem_desc();
             }
             
         }
@@ -344,7 +367,7 @@ namespace sELedit
                     IEnumerable<PCKFileEntry> source = pck.Files.Where<PCKFileEntry>((Func<PCKFileEntry, bool>)(i => i.Path.StartsWith("configs\\item_desc.txt")));
                     byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
                    // var sd = pck.
-                    string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\configs\item_desc.txt";
+                    string tempFileName = GetBaseDirectory() + @"\" + @"resources\configs\item_desc.txt";
                     string tempDir = Path.GetDirectoryName(tempFileName);
                     Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFileName, array);
@@ -400,7 +423,7 @@ namespace sELedit
                         IEnumerable<PCKFileEntry> source = pck.Files.Where<PCKFileEntry>((Func<PCKFileEntry, bool>)(i => i.Path.StartsWith("configs\\item_ext_desc.txt")));
                         byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
 
-                        string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\configs\item_ext_desc.txt";
+                        string tempFileName = GetBaseDirectory() + @"\" + @"resources\configs\item_ext_desc.txt";
                         string tempDir = Path.GetDirectoryName(tempFileName);
                         Directory.CreateDirectory(tempDir);
                         File.WriteAllBytes(tempFileName, array);
@@ -512,7 +535,7 @@ namespace sELedit
                         if (bmp2 != null)
                         {
                             sourceBitmap = bmp2;
-                            string tempFileName_img = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\surfaces\iconset\iconlist_ivtrm.dds";
+                            string tempFileName_img = GetBaseDirectory() + @"\" + @"resources\surfaces\iconset\iconlist_ivtrm.dds";
                             string tempDir_img = Path.GetDirectoryName(tempFileName_img);
                             Directory.CreateDirectory(tempDir_img);
                             if (File.Exists(tempFileName_img))
@@ -526,7 +549,7 @@ namespace sELedit
                         {
                             // Log error instead of showing MessageBox from background thread
                             System.Diagnostics.Debug.WriteLine("Unable to load thumbnails...");
-                            //sourceBitmap = (Bitmap)Image.FromFile(Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\surfaces\\iconset\\iconlist_ivtrm.png");
+                            //sourceBitmap = (Bitmap)Image.FromFile(GetBaseDirectory() + "\\resources\\surfaces\\iconset\\iconlist_ivtrm.png");
                         }
                     }
 
@@ -541,7 +564,7 @@ namespace sELedit
                     IEnumerable<PCKFileEntry> source = pck.Files.Where<PCKFileEntry>((Func<PCKFileEntry, bool>)(i => i.Path.StartsWith("surfaces\\iconset\\iconlist_ivtrm.txt")));
                     byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
 
-                    string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\surfaces\iconset\iconlist_ivtrm.txt";
+                    string tempFileName = GetBaseDirectory() + @"\" + @"resources\surfaces\iconset\iconlist_ivtrm.txt";
                     string tempDir = Path.GetDirectoryName(tempFileName);
                     Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFileName, array);
@@ -634,7 +657,7 @@ namespace sELedit
                     IEnumerable<PCKFileEntry> source = pck.Files.Where<PCKFileEntry>((Func<PCKFileEntry, bool>)(i => i.Path.StartsWith("configs\\skillstr.txt")));
                     byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
 
-                    string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\configs\skillstr.txt";
+                    string tempFileName = GetBaseDirectory() + @"\" + @"resources\configs\skillstr.txt";
                     string tempDir = Path.GetDirectoryName(tempFileName);
                     Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFileName, array);
@@ -691,7 +714,7 @@ namespace sELedit
                 MainWindow.addonslist = database.addonslist;
                 return;
             }
-            String path = Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\data\\addon_table.txt";
+            String path = Path.Combine(GetBaseDirectory(), @"resources\data\addon_table.txt");
             MainWindow.addonslist = new SortedList();
             if (File.Exists(path))
             {
@@ -727,7 +750,7 @@ namespace sELedit
         public void LoadLocalizationText()
         {
             MainWindow.LocalizationText = new SortedList();
-            string path = Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\data\\language_en.txt";
+            string path = Path.Combine(GetBaseDirectory(), @"resources\data\language_en.txt");
             if (File.Exists(path))
             {
                 try
@@ -769,7 +792,7 @@ namespace sELedit
 
         //    database.defaultMapsTemplate = new SortedList<int, Map>();
         //    MainWindow.InstanceList = new SortedList();
-        //    String path = Path.GetDirectoryName(Application.ExecutablePath) + "\\configs\\instance_en.txt";
+        //    String path = GetBaseDirectory() + "\\configs\\instance_en.txt";
         //    if (File.Exists(path))
         //    {
         //        try
@@ -831,7 +854,7 @@ namespace sELedit
                     IEnumerable<PCKFileEntry> source = pck.Files.Where<PCKFileEntry>((Func<PCKFileEntry, bool>)(i => i.Path.StartsWith("configs\\buff_str.txt")));
                     byte[] array = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
 
-                    string tempFileName = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\configs\buff_str.txt";
+                    string tempFileName = GetBaseDirectory() + @"\" + @"resources\configs\buff_str.txt";
                     string tempDir = Path.GetDirectoryName(tempFileName);
                     Directory.CreateDirectory(tempDir);
                     File.WriteAllBytes(tempFileName, array);
