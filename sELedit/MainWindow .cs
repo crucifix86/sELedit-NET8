@@ -187,7 +187,7 @@ namespace sELedit
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving settings: " + ex.Message);
+                ErrorHandler.ShowErrorWithClipboard("Error saving settings", ex);
             }
         }
         
@@ -439,7 +439,7 @@ namespace sELedit
                     }
                     catch (Exception e)
                     {
-                        MessageBox.Show(e.Message + "\n\n\n" + e);
+                        ErrorHandler.ShowErrorWithClipboard("Error occurred", e);
 
                     }
                 }
@@ -487,7 +487,7 @@ namespace sELedit
                 }
                 catch
                 {
-                    MessageBox.Show("SAVING ERROR!\nThis error mostly occurs of configuration and elements.data mismatch");
+                    ErrorHandler.ShowErrorWithClipboard("SAVING ERROR", "This error mostly occurs of configuration and elements.data mismatch");
                     //progressBar_progress.Style = ProgressBarStyle.Continuous;
                     Cursor = Cursors.Default;
                 }
@@ -544,7 +544,7 @@ namespace sELedit
                 }
                 catch
                 {
-                    MessageBox.Show("SAVING ERROR!\nThis error mostly occurs of configuration and elements.data mismatch");
+                    ErrorHandler.ShowErrorWithClipboard("SAVING ERROR", "This error mostly occurs of configuration and elements.data mismatch");
                     //progressBar_progress.Style = ProgressBarStyle.Continuous;
                     Cursor = Cursors.Default;
                 }
@@ -1922,7 +1922,7 @@ namespace sELedit
                 }
                 catch (Exception exs)
                 {
-                    MessageBox.Show("CHANGING ERROR!\nFailed changing value, this value seems to be invalid.\n" + exs.Message);
+                    ErrorHandler.ShowErrorWithClipboard("CHANGING ERROR", exs);
                 }
 
                 DataGrid(null, null, grid);

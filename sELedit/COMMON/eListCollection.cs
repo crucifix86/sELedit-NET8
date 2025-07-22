@@ -480,7 +480,7 @@ namespace sELedit
 			}
 			else
 			{
-				MessageBox.Show("No corressponding configuration file found!\nVersion: " + Version + "\nPattern: " + "configs\\PW_*_v" + Version + ".cfg");
+				ErrorHandler.ShowErrorWithClipboard("Configuration Error", "No corressponding configuration file found!\nVersion: " + Version + "\nPattern: " + "configs\\PW_*_v" + Version + ".cfg");
 			}
 
 			br.Close();
@@ -561,7 +561,7 @@ namespace sELedit
 			}
 			else
 			{
-				MessageBox.Show("Rules file is missing parameter\n\nSETVERSION:", "Export Failed");
+				ErrorHandler.ShowErrorWithClipboard("Export Failed", "Rules file is missing parameter\n\nSETVERSION:");
 				bw.Close();
 				fs.Close();
 				return;
@@ -573,7 +573,7 @@ namespace sELedit
 			}
 			else
 			{
-				MessageBox.Show("Rules file is missing parameter\n\nSETSIGNATURE:", "Export Failed");
+				ErrorHandler.ShowErrorWithClipboard("Export Failed", "Rules file is missing parameter\n\nSETSIGNATURE:");
 				bw.Close();
 				fs.Close();
 				return;
