@@ -9,6 +9,29 @@ namespace sELedit
 {
 	public class eListCollection
 	{
+		private static string GetConfigsDirectory()
+		{
+			// In .NET 8, we need to adjust the path
+			string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+			string baseDir = Path.GetDirectoryName(exePath);
+			
+			// If we're in a Debug/Release subfolder, go up to the project root
+			if (baseDir.EndsWith(@"\Debug\net8.0-windows") || baseDir.EndsWith(@"\Release\net8.0-windows"))
+			{
+				// Go up 3 directories to get to the actual project directory from bin/Debug/net8.0-windows
+				baseDir = Directory.GetParent(Directory.GetParent(Directory.GetParent(baseDir).FullName).FullName).FullName;
+			}
+			
+			string configsPath = Path.Combine(baseDir, "configs");
+			
+			// Create directory if it doesn't exist
+			if (!Directory.Exists(configsPath))
+			{
+				Directory.CreateDirectory(configsPath);
+			}
+			
+			return configsPath;
+		}
 		public eListCollection(string elFile, ref ColorProgressBar.ColorProgressBar cpb2)
 		{
 			Lists = Load(elFile, ref cpb2);
@@ -275,7 +298,8 @@ namespace sELedit
 			Signature = br.ReadInt16();
 
 			// check if a corresponding configuration file exists
-			 string[] configFiles = Directory.GetFiles(Application.StartupPath + "\\configs", "PW_*_v" + Version + ".cfg");
+			string configsPath = GetConfigsDirectory();
+			string[] configFiles = Directory.Exists(configsPath) ? Directory.GetFiles(configsPath, "PW_*_v" + Version + ".cfg") : new string[0];
 			if (configFiles.Length > 0)
 			{
 				// configure an eList array with the configuration file
