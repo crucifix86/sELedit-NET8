@@ -91,7 +91,7 @@ namespace sELedit
             #endregion
 
             asm = new AssetManager();
-            AssetManagerLoad = new Thread(delegate () { asm.load(ref cpb2); Loads(); }); AssetManagerLoad.Start();
+            AssetManagerLoad = new Thread(delegate () { asm.load(cpb2, this); Loads(); }); AssetManagerLoad.Start();
 
           
         }

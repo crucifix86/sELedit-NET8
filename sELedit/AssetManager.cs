@@ -40,11 +40,14 @@ namespace sELedit
 		
 		public SortedList<int, Image> ImageTask;
 
-		public bool load(ref ColorProgressBar.ColorProgressBar cpb2)
+		public bool load(ColorProgressBar.ColorProgressBar cpb2, System.Windows.Forms.Control invokeControl)
         {
-            cpb2.Maximum = 10;
-            cpb2.Minimum = 0;
-            cpb2.Value = 0;
+            // Initialize progress bar on UI thread
+            invokeControl.Invoke((System.Windows.Forms.MethodInvoker)delegate {
+                cpb2.Maximum = 10;
+                cpb2.Minimum = 0;
+                cpb2.Value = 0;
+            });
 
             firstLoad = true;
             
@@ -52,38 +55,31 @@ namespace sELedit
             {
                
                 imageposition = LoadSurfaces();
-                cpb2.Value++;
+                UpdateProgress(cpb2, invokeControl);
                 loadItem_color();
-                cpb2.Value++;
+                UpdateProgress(cpb2, invokeControl);
             }
 
             if (firstLoad)
             {
 				imagsTask();
-                cpb2.Value++;
+                UpdateProgress(cpb2, invokeControl);
                 //LoadTheme();
-                Application.DoEvents();
-                cpb2.Value++;
+                UpdateProgress(cpb2, invokeControl);
                 LoadLocalizationText();
-                Application.DoEvents();
                 //this.LoadInstanceList();
-                //Application.DoEvents();
-                cpb2.Value++;
+                UpdateProgress(cpb2, invokeControl);
                 LoadBuffList();
-                Application.DoEvents();
-                cpb2.Value++;
+                UpdateProgress(cpb2, invokeControl);
                 LoadItemExtDescList();
-                Application.DoEvents();
-                cpb2.Value++;
+                UpdateProgress(cpb2, invokeControl);
                 LoadSkillList();
-                Application.DoEvents();
-                cpb2.Value++;
+                UpdateProgress(cpb2, invokeControl);
                 LoadAddonList();
-                cpb2.Value++;
-                Application.DoEvents();
+                UpdateProgress(cpb2, invokeControl);
                 firstLoad = false;
 				addons_wac();
-                cpb2.Value++;
+                UpdateProgress(cpb2, invokeControl);
 
 
             }
@@ -91,6 +87,14 @@ namespace sELedit
             MainWindow.database = database;
             
             return true;
+        }
+        
+        private void UpdateProgress(ColorProgressBar.ColorProgressBar cpb2, System.Windows.Forms.Control invokeControl)
+        {
+            invokeControl.Invoke((System.Windows.Forms.MethodInvoker)delegate {
+                cpb2.Value++;
+                System.Windows.Forms.Application.DoEvents();
+            });
         }
 
         public void imagsTask()
@@ -211,7 +215,6 @@ namespace sELedit
                 Encoding enc = Encoding.GetEncoding("GBK");
                 int lines = File.ReadAllLines(theme_list).Length;
                 StreamReader file = new StreamReader(theme_list, enc);
-                Application.DoEvents();
                 int count = 0;
 
                 while ((line = file.ReadLine()) != null)
@@ -337,7 +340,6 @@ namespace sELedit
                                 data = data.Where(a => a != "").ToArray();
                                 try
                                 {
-                                    Application.DoEvents();
                                     item_desc.Add(i, data[0])/*, data[1].ToString().Replace('"', ' ')*/;
                                 }
                             catch (Exception e) { MessageBox.Show(e.Message); }
@@ -548,7 +550,6 @@ namespace sELedit
                     LP.preg_max = fileNames.Count;
                     for (int a = 0; a < fileNames.Count; a++)
                     {
-                        Application.DoEvents();
                         y = a / cols;
                         x = a - y * cols;
                         x = x * w;
