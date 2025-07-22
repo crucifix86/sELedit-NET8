@@ -12,6 +12,16 @@ namespace sELedit
 {
     public partial class Select_id : Form
     {
+        // Properties for legacy usage
+        public object input { get; set; }
+        public object retorn { get; set; }
+        
+        // Default constructor for legacy usage
+        public Select_id()
+        {
+            InitializeComponent();
+        }
+        
         public Select_id(MainWindow f,LBLIBRARY.PWHelper.Elements ds,int[] Items_amount,bool IconsLoaded)
         {
             this.wp = ds;

@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <OutputType>Library</OutputType>
+    <AssemblyName>LBLIBRARY</AssemblyName>
+    <RootNamespace>LBLIBRARY</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetZip" Version="1.16.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Global.cs" />
+    <Compile Include="LBLIBRARY\**\*.cs" />
+    <Compile Include="..\sELedit\DDSReader\**\*.cs" Link="DDSReader\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="LBLIBRARY.Components.TextBoxEx.resources" />
+    <EmbeddedResource Include="LBLIBRARY.Properties.Resources.resources" />
+    <EmbeddedResource Include="LBLIBRARY.Components.UpdatesForm.resources" />
+    <EmbeddedResource Include="LBLIBRARY.Standard.ico" />
+    <EmbeddedResource Include="LBLIBRARY.Small.ico" />
+    <EmbeddedResource Include="LBLIBRARY.Default.ico" />
+    <EmbeddedResource Include="LBLIBRARY.Enter.ico" />
+  </ItemGroup>
+
+</Project>

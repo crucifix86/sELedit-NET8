@@ -2444,7 +2444,7 @@ namespace sELedit
 
             try
             {
-                tabControl_INFO.Invoke((MethodInvoker)delegate ()
+                tabControl_INFO.Invoke((System.Windows.Forms.MethodInvoker)delegate ()
                 {
                     this.Enabled = true;
                     tabControl_INFO.TabPages.Remove(tabPage_addons);
@@ -3199,7 +3199,7 @@ namespace sELedit
         {
 
             string file = XmlData.ElementsDataPath;
-            comboBox_lists.Invoke((MethodInvoker)delegate
+            comboBox_lists.Invoke((System.Windows.Forms.MethodInvoker)delegate
             {
 
                 try
@@ -3951,7 +3951,7 @@ namespace sELedit
             bool xds = false;
             bool xds2 = false;
 
-            comboBox_lists.Invoke((MethodInvoker)delegate () {
+            comboBox_lists.Invoke((System.Windows.Forms.MethodInvoker)delegate () {
 
                 xds = comboBox_lists.SelectedIndex != 54;
                 xds2 = comboBox_lists.SelectedIndex != 40;

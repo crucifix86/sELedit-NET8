@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.IO;
-using zlib;
+using Ionic.Zlib;
 
 namespace sELedit.newPck
 {
@@ -8,26 +8,53 @@ namespace sELedit.newPck
     {
         public static byte[] Decompress(byte[] bytes, int size)
         {
-            byte[] buffer = new byte[size];
-            ZOutputStream zoutputStream = new ZOutputStream((Stream)new MemoryStream(buffer));
             try
             {
-                PCKZlib.CopyStream((Stream)new MemoryStream(bytes), (Stream)zoutputStream, size);
+                using (var input = new MemoryStream(bytes))
+                using (var output = new MemoryStream())
+                using (var zlibStream = new ZlibStream(input, CompressionMode.Decompress))
+                {
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = zlibStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        output.Write(buffer, 0, bytesRead);
+                    }
+                    
+                    byte[] result = output.ToArray();
+                    if (result.Length != size)
+                    {
+                        Array.Resize(ref result, size);
+                    }
+                    return result;
+                }
             }
             catch
             {
                 Console.WriteLine("Bad zlib data");
+                return new byte[size];
             }
-            return buffer;
         }
 
         public static byte[] Compress(byte[] bytes, int CompressionLevel)
         {
-            MemoryStream memoryStream = new MemoryStream();
-            ZOutputStream zoutputStream = new ZOutputStream((Stream)memoryStream, CompressionLevel);
-            PCKZlib.CopyStream((Stream)new MemoryStream(bytes), (Stream)zoutputStream, bytes.Length);
-            zoutputStream.finish();
-            return memoryStream.ToArray().Length >= bytes.Length ? bytes : memoryStream.ToArray();
+            try
+            {
+                using (var output = new MemoryStream())
+                {
+                    using (var zlibStream = new ZlibStream(output, CompressionMode.Compress, (CompressionLevel)CompressionLevel))
+                    {
+                        zlibStream.Write(bytes, 0, bytes.Length);
+                    }
+                    
+                    byte[] compressed = output.ToArray();
+                    return compressed.Length >= bytes.Length ? bytes : compressed;
+                }
+            }
+            catch
+            {
+                return bytes;
+            }
         }
 
         public static void CopyStream(Stream input, Stream output, int Size)

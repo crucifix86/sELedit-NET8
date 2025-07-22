@@ -1,5 +1,4 @@
-﻿using DevIL;
-using DevIL.Unmanaged;
+﻿using sELedit.DDSReader;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -21,26 +20,13 @@ namespace sELedit.newPck.read
         }
         public static Bitmap LoadDDSImage(byte[] ByteArray)
         {
-            Bitmap bitmap = (Bitmap)null;
-            IL.Initialize();
-            IL.Enable(ILEnable.AbsoluteFormat);
-            IL.SetDataFormat(DataFormat.BGRA);
-            IL.Enable(ILEnable.AbsoluteType);
-            IL.SetDataType(DataType.UnsignedByte);
-            MemoryStream memoryStream = new MemoryStream(ByteArray);
-            if (IL.LoadImageFromStream((Stream)memoryStream))
+            // Create a MemoryStream from the byte array
+            using (MemoryStream memoryStream = new MemoryStream(ByteArray))
             {
-                ImageInfo imageInfo = IL.GetImageInfo();
-                bitmap = new Bitmap(imageInfo.Width, imageInfo.Height, PixelFormat.Format32bppArgb);
-                Rectangle rect = new Rectangle(0, 0, imageInfo.Width, imageInfo.Height);
-                BitmapData bitmapdata = bitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-                IntPtr scan0 = bitmapdata.Scan0;
-                IL.CopyPixels(0, 0, 0, imageInfo.Width, imageInfo.Height, 1, DataFormat.BGRA, DataType.UnsignedByte, scan0);
-                bitmap.UnlockBits(bitmapdata);
+                // Create a new DDS object with that stream and call GetBitmap() to get the Bitmap
+                Bitmap bitmap = DDS.LoadImage(memoryStream);
+                return bitmap;
             }
-            IL.Shutdown();
-            memoryStream.Close();
-            return bitmap;
         }
 
 
