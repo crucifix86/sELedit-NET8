@@ -123,10 +123,10 @@ namespace sELedit
 			string am = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\opt\add_armor.txt";
 			string dec = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\opt\add_decoration.txt";
 			string st = Path.GetDirectoryName(Application.ExecutablePath) + @"\" + @"resources\opt\add_suite.txt";
-			string[] lines_w = File.ReadAllLines(wp);
-			string[] lines_a = File.ReadAllLines(am);
-			string[] lines_d = File.ReadAllLines(dec);
-			string[] lines_e = File.ReadAllLines(st);
+			string[] lines_w = File.Exists(wp) ? File.ReadAllLines(wp) : new string[0];
+			string[] lines_a = File.Exists(am) ? File.ReadAllLines(am) : new string[0];
+			string[] lines_d = File.Exists(dec) ? File.ReadAllLines(dec) : new string[0];
+			string[] lines_e = File.Exists(st) ? File.ReadAllLines(st) : new string[0];
 			_wepon = new SortedList(); _armor = new SortedList(); _decoration = new SortedList(); _suite = new SortedList();
 			_wepon.Clear(); _armor.Clear(); _decoration.Clear(); _suite.Clear();
             
@@ -294,53 +294,13 @@ namespace sELedit
 				}
                 else
                 {
-                    string line;
+                    // No configs.pck available - use empty data
                     item_color = new SortedList<int, int>();
-                    string iconlist_ivtrm = Path.GetDirectoryName(Application.ExecutablePath) + @"\resources\configs\item_color.txt";
-
-                    string extension = Path.GetExtension(iconlist_ivtrm);
-                    if (extension == ".txt")
-                    {
-                        Encoding enc = Encoding.GetEncoding("GBK");
-                        int lines = File.ReadAllLines(iconlist_ivtrm).Length;
-                        StreamReader file = new StreamReader(iconlist_ivtrm, enc);
-                        int count = 0;
-                        while ((line = file.ReadLine()) != null)
-                        {
-                            Application.DoEvents();
-                            string[] data = line.Split(null);
-                            try
-                            {
-                                string v1 = data[0].ToString();
-                                string v2 = data[1].ToString();
-                                if (v1.Length > 0 && v2.Length > 0)
-                                {
-                                    item_color.Add(int.Parse(v1), int.Parse(v2));
-                                }
-                                else
-                                {
-                                    if (v1.Length > 0)
-                                    {
-                                        item_color.Add(int.Parse(v1), 0);
-                                    }
-                                    if (v2.Length > 0)
-                                    {
-                                        item_color.Add(0, int.Parse(v2));
-                                    }
-                                }
-                            }
-                            catch (Exception) { }
-                            count++;
-                        }
-                        file.Close();
-                    }
-
-					database.item_color = item_color;
-
-					loaditem_desc();
-
-
-				}
+                    database.item_color = item_color;
+                    
+                    // Still need to call loaditem_desc to continue the chain
+                    loaditem_desc();
+                }
             }
             catch (Exception)
             {
@@ -387,31 +347,8 @@ namespace sELedit
                 }
                 else
                 {
-                    string line;
+                    // No configs.pck available - use empty data
                     item_desc = new SortedList<int, string>();
-                    string iconlist_ivtrm = Path.GetDirectoryName(Application.ExecutablePath) + @"\resources\configs\item_desc.txt";
-                    Encoding enc = Encoding.GetEncoding("GBK");
-                    int lines = File.ReadAllLines(iconlist_ivtrm).Length;
-                    StreamReader file = new StreamReader(iconlist_ivtrm, enc);
-                    Application.DoEvents();
-                    int count = 0;
-
-                    while ((line = file.ReadLine()) != null)
-                    {
-                        if (line != null && line.Length > 0 && !line.StartsWith("#") && !line.StartsWith("/"))
-                        {
-                            string[] data = line.Split('"');
-                            data = data.Where(a => a != "").ToArray();
-                            try
-                            {
-                                Application.DoEvents();
-                                item_desc.Add(count, data[0])/*, data[1].ToString().Replace('"', ' ')*/;
-                            }
-                            catch (Exception) { }
-                        }
-                        count++;
-                    }
-                    file.Close();
                     database.item_desc = item_desc;
                 }
             }
@@ -506,42 +443,8 @@ namespace sELedit
                 }
                 else
                 {
-                    try
-                    {
-                        string path = Path.GetDirectoryName(Application.ExecutablePath) + @"\resources\configs\item_ext_desc.txt";
-                        string extension = Path.GetExtension(path);
-                        if (File.Exists(path))
-                        {
-                            try
-                            {
-                                item_ext_desc = new SortedList();
-
-                                using(StreamReader sr = new StreamReader(path, Encoding.Unicode))
-                                while (!sr.EndOfStream)
-                                {   
-                                        string line = sr.ReadLine();
-                                        if (!(line.StartsWith("#") || line.StartsWith("/") || string.IsNullOrEmpty(line)))
-                                        {
-                                            var xLine = line.Split('"').Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                                            item_ext_desc.Add(xLine[0].Replace("\t",null), xLine[1]);
-                                        }
-                                }
-
-                            }
-                            catch (Exception e)
-                            {
-                                MessageBox.Show("ERROR LOADING ITEM DESCRIPTION LIST\n" + e.Message);
-                            }
-                        }
-                        else
-                        {
-                            MessageBox.Show("NOT FOUND item_ext_desc.txt!");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("ERROR LOADING ITEM DESCRIPTION LIST\n" + ex.Message);
-                    }
+                    // No configs.pck available - use empty data
+                    item_ext_desc = new SortedList();
                 }
 
 
@@ -730,26 +633,8 @@ namespace sELedit
                         MainWindow.skillstr = database.skillstr;
                         return;
                     }
-                    String path = Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\configs\\skillstr.txt";
-                    if (File.Exists(path))
-                    {
-                        try
-                        {
-                            StreamReader sr = new StreamReader(path, Encoding.Unicode);
-                            MainWindow.skillstr = sr.ReadToEnd().Split(new char[] { '\"' });
-                            string[] temp = MainWindow.skillstr[0].Split(new char[] { '\n' });
-                            MainWindow.skillstr[0] = temp[temp.Length - 1];
-                            sr.Close();
-                        }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show("ERROR LOADING SKILL LIST\n" + e.Message);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("NOT FOUND localization\\skillstr.txt!");
-                    }
+                    // No configs.pck available - use empty data
+                    MainWindow.skillstr = new string[0];
                     database.skillstr = MainWindow.skillstr;
                 }
 
@@ -797,10 +682,7 @@ namespace sELedit
                     MessageBox.Show("ERROR LOADING ADDON LIST\n" + e.Message);
                 }
             }
-            else
-            {
-                MessageBox.Show("NOT FOUND! " + path);
-            }
+            // If file doesn't exist, just use empty list
             database.addonslist = MainWindow.addonslist;
         }
 
@@ -834,10 +716,7 @@ namespace sELedit
                     MessageBox.Show("ERROR LOADING LOCALIZATION\n" + e.Message);
                 }
             }
-            else
-            {
-                MessageBox.Show("NOT FOUND localization:" + path + "!");
-            }
+            // If file doesn't exist, just use empty list
             database.LocalizationText = MainWindow.LocalizationText;
         }
 
@@ -941,27 +820,8 @@ namespace sELedit
                 }
                 else
                 {
-                    string path = Path.GetDirectoryName(Application.ExecutablePath) + "\\resources\\configs\\buff_str.txt";
-                    if (File.Exists(path))
-                    {
-                        try
-                        {
-                            StreamReader sr = new StreamReader(path, Encoding.Unicode);
-                            MainWindow.buff_str = sr.ReadToEnd().Split(new char[] { '\"' });
-                            string[] temp = MainWindow.buff_str[0].Split(new char[] { '\n' });
-                            MainWindow.buff_str[0] = temp[temp.Length - 1];
-
-                            sr.Close();
-                        }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show("ERROR LOADING BUFF LIST\n" + e.Message);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("NOT FOUND localization\\buff_str.txt!");
-                    }
+                    // No configs.pck available - use empty data
+                    MainWindow.buff_str = new string[0];
                     database.buff_str = MainWindow.buff_str;
                 }
 
