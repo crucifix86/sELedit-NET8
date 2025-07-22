@@ -104,21 +104,21 @@ namespace sELedit
             this.Invoke((MethodInvoker)delegate () { this.Enabled = true; });
 
             
-            if (r == true)
+            if (r == true && XmlData != null)
             {
-                if (File.Exists(XmlData.ElementsDataPath))
+                if (!string.IsNullOrEmpty(XmlData.ElementsDataPath) && File.Exists(XmlData.ElementsDataPath))
                 {
                     Thread element = new Thread(new ThreadStart(LoadElementData));
                     element.Start();
 
                 }
-                if (File.Exists(XmlData.TasksDataPath))
+                if (!string.IsNullOrEmpty(XmlData.TasksDataPath) && File.Exists(XmlData.TasksDataPath))
                 {
                     Thread tasks = new Thread(new ThreadStart(ReadTask));
                     tasks.Start();
 
                 }
-                if (File.Exists(XmlData.GshopDataPath))
+                if (!string.IsNullOrEmpty(XmlData.GshopDataPath) && File.Exists(XmlData.GshopDataPath))
                 {
                     Thread gshop = new Thread(new ThreadStart(ReadShops));
                     gshop.Start();
@@ -127,12 +127,15 @@ namespace sELedit
 
             }
             bool el = false; bool cf = false; bool sf = false; bool tk = false; bool g1 = false; bool g2 = false;
-            if (File.Exists(XmlData.ElementsDataPath)) { el = true; }
-            if (File.Exists(XmlData.ConfigsPckPath)) { cf = true; }
-            if (File.Exists(XmlData.SurfacesPckPath)) { sf = true; }
-            if (File.Exists(XmlData.TasksDataPath)) { tk = true; }
-            if (File.Exists(XmlData.GshopDataPath)) { g1 = true; }
-            if (File.Exists(XmlData.Gshop1DataPath)) { g2 = true; }
+            if (XmlData != null)
+            {
+                if (!string.IsNullOrEmpty(XmlData.ElementsDataPath) && File.Exists(XmlData.ElementsDataPath)) { el = true; }
+                if (!string.IsNullOrEmpty(XmlData.ConfigsPckPath) && File.Exists(XmlData.ConfigsPckPath)) { cf = true; }
+                if (!string.IsNullOrEmpty(XmlData.SurfacesPckPath) && File.Exists(XmlData.SurfacesPckPath)) { sf = true; }
+                if (!string.IsNullOrEmpty(XmlData.TasksDataPath) && File.Exists(XmlData.TasksDataPath)) { tk = true; }
+                if (!string.IsNullOrEmpty(XmlData.GshopDataPath) && File.Exists(XmlData.GshopDataPath)) { g1 = true; }
+                if (!string.IsNullOrEmpty(XmlData.Gshop1DataPath) && File.Exists(XmlData.Gshop1DataPath)) { g2 = true; }
+            }
             if (el == true && cf == true && sf == true && tk == true && g1 == true && g2 == true)
             {
                 toolStripButton_Config.Image = Properties.Resources.icon_3_0_alpha;
@@ -146,6 +149,14 @@ namespace sELedit
         {
             try
             {
+                if (!File.Exists(caminho))
+                {
+                    // Create default settings if file doesn't exist
+                    XmlData = new configs.Settings();
+                    SaveXML();
+                    return true;
+                }
+                
                 deserializer = new XmlSerializer(typeof(configs.Settings));
                 reader = new StreamReader(caminho);
                 obj = deserializer.Deserialize(reader);
@@ -156,14 +167,33 @@ namespace sELedit
             }
             catch (Exception)
             {
-                reader.Close();
+                reader?.Close();
+                // Create default settings on error
+                XmlData = new configs.Settings();
                 return false;
             }
 
         }
+        
+        void SaveXML()
+        {
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(configs.Settings));
+                using (StreamWriter writer = new StreamWriter(caminho))
+                {
+                    serializer.Serialize(writer, XmlData);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving settings: " + ex.Message);
+            }
+        }
+        
         void ReadTask()
         {
-            if (File.Exists(XmlData.TasksDataPath))
+            if (XmlData != null && File.Exists(XmlData.TasksDataPath))
             {
                 try
                 {
@@ -294,7 +324,7 @@ namespace sELedit
         }
         void ReadShops()
         {
-            if (File.Exists(XmlData.GshopDataPath))
+            if (XmlData != null && !string.IsNullOrEmpty(XmlData.GshopDataPath) && File.Exists(XmlData.GshopDataPath))
             {
                 try
                 {
@@ -308,7 +338,7 @@ namespace sELedit
 
                 }
             }
-            if (File.Exists(XmlData.Gshop1DataPath))
+            if (XmlData != null && !string.IsNullOrEmpty(XmlData.Gshop1DataPath) && File.Exists(XmlData.Gshop1DataPath))
             {
                 try
                 {
@@ -325,7 +355,9 @@ namespace sELedit
         }
         void LoadElementData()
         {
-
+            if (XmlData == null || string.IsNullOrEmpty(XmlData.ElementsDataPath))
+                return;
+                
             string file = XmlData.ElementsDataPath;
             comboBox_lists.Invoke((MethodInvoker)delegate
             {
@@ -464,12 +496,18 @@ namespace sELedit
 
         private void saveGshop12ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (database.Gshop != null)
+            if (XmlData == null)
+            {
+                MessageBox.Show("Configuration not loaded. Please load settings first.");
+                return;
+            }
+            
+            if (database.Gshop != null && !string.IsNullOrEmpty(XmlData.GshopDataPath))
             {
                 SalveShops.SaveGshopData(database.Gshop, XmlData.GshopDataPath);
                 SalveShops.SaveGshopSevData(database.Gshop, XmlData.GshopDataPath);
             }
-            if (database.GshopEvent != null)
+            if (database.GshopEvent != null && !string.IsNullOrEmpty(XmlData.Gshop1DataPath))
             {
                 SalveShops.SaveGshopData(database.GshopEvent, XmlData.Gshop1DataPath);
                 SalveShops.SaveGshopSevData(database.GshopEvent, XmlData.Gshop1DataPath);

@@ -245,7 +245,7 @@ namespace sELedit
 		{
             try
             {
-                if (File.Exists(MainWindow.XmlData.ConfigsPckPath))
+                if (MainWindow.XmlData != null && !string.IsNullOrEmpty(MainWindow.XmlData.ConfigsPckPath) && File.Exists(MainWindow.XmlData.ConfigsPckPath))
                 {
                     item_color = new SortedList<int,int>();
                     pck = new PCKs(MainWindow.XmlData.ConfigsPckPath);
@@ -353,7 +353,7 @@ namespace sELedit
             try
             {
                 
-                if (File.Exists(MainWindow.XmlData.ConfigsPckPath))
+                if (MainWindow.XmlData != null && !string.IsNullOrEmpty(MainWindow.XmlData.ConfigsPckPath) && File.Exists(MainWindow.XmlData.ConfigsPckPath))
                 {
                     pck = new PCKs(MainWindow.XmlData.ConfigsPckPath);
                     item_desc = new SortedList<int, string>();
@@ -430,7 +430,7 @@ namespace sELedit
                     return;
                 }
 
-                if (File.Exists(MainWindow.XmlData.ConfigsPckPath))
+                if (MainWindow.XmlData != null && !string.IsNullOrEmpty(MainWindow.XmlData.ConfigsPckPath) && File.Exists(MainWindow.XmlData.ConfigsPckPath))
                 {
                     pck = new PCKs(MainWindow.XmlData.ConfigsPckPath);
                     try
@@ -553,7 +553,7 @@ namespace sELedit
 
 		private SortedList<string, Point> LoadSurfaces()
         {
-           if (File.Exists(MainWindow.XmlData.SurfacesPckPath))
+           if (MainWindow.XmlData != null && !string.IsNullOrEmpty(MainWindow.XmlData.SurfacesPckPath) && File.Exists(MainWindow.XmlData.SurfacesPckPath))
                 {
                     pck = new PCKs(MainWindow.XmlData.SurfacesPckPath);
                     IEnumerable<PCKFileEntry> source_img = pck.Files.Where<PCKFileEntry>((Func<PCKFileEntry, bool>)(i => i.Path.StartsWith("surfaces\\iconset\\iconlist_ivtrm.dds")));
@@ -765,7 +765,7 @@ namespace sELedit
         {
             try
             {
-                if (File.Exists(MainWindow.XmlData.ConfigsPckPath))
+                if (MainWindow.XmlData != null && !string.IsNullOrEmpty(MainWindow.XmlData.ConfigsPckPath) && File.Exists(MainWindow.XmlData.ConfigsPckPath))
                 {
                     pck = new PCKs(MainWindow.XmlData.ConfigsPckPath);
                     IEnumerable<PCKFileEntry> source = pck.Files.Where<PCKFileEntry>((Func<PCKFileEntry, bool>)(i => i.Path.StartsWith("configs\\skillstr.txt")));
@@ -980,7 +980,7 @@ namespace sELedit
                     return;
                 }
 
-                if (File.Exists(MainWindow.XmlData.ConfigsPckPath))
+                if (MainWindow.XmlData != null && !string.IsNullOrEmpty(MainWindow.XmlData.ConfigsPckPath) && File.Exists(MainWindow.XmlData.ConfigsPckPath))
                 {
                     pck = new PCKs(MainWindow.XmlData.ConfigsPckPath);
                     IEnumerable<PCKFileEntry> source = pck.Files.Where<PCKFileEntry>((Func<PCKFileEntry, bool>)(i => i.Path.StartsWith("configs\\buff_str.txt")));
