@@ -148,7 +148,8 @@ namespace sELedit
 						imageList1.Images.Add(Image.FromFile(arquivos[fd]));
 					}
 				}
-				MainWindow.database.ImageTask = imageList1;
+				// Store in local database first - it will be assigned to MainWindow.database later
+				database.ImageTask = imageList1;
 			}
 			catch (Exception ex)
 			{
@@ -303,24 +304,27 @@ namespace sELedit
 
                     for (int i = 0; i < item_color_Read.Length; i++)
                     {
-                        if (item_color_Read[i] != null)
+                        if (item_color_Read[i] != null && !string.IsNullOrWhiteSpace(item_color_Read[i]))
                         {
-                            string[] data = item_color_Read[i].Split(null);
-                            string v1 = data[0].ToString();
-                            string v2 = data[1].ToString();
-                            if (v1.Length > 0 && v2.Length > 0)
+                            string[] data = item_color_Read[i].Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+                            if (data.Length >= 2)
                             {
-                                item_color.Add(int.Parse(v1), int.Parse(v2));
-                            }
-                            else
-                            {
-                                if (v1.Length > 0)
+                                string v1 = data[0].ToString();
+                                string v2 = data[1].ToString();
+                                if (v1.Length > 0 && v2.Length > 0)
                                 {
-                                    item_color.Add(int.Parse(v1), 0);
+                                    item_color.Add(int.Parse(v1), int.Parse(v2));
                                 }
-                                if (v2.Length > 0)
+                                else
                                 {
-                                    item_color.Add(0, int.Parse(v2));
+                                    if (v1.Length > 0)
+                                    {
+                                        item_color.Add(int.Parse(v1), 0);
+                                    }
+                                    if (v2.Length > 0)
+                                    {
+                                        item_color.Add(0, int.Parse(v2));
+                                    }
                                 }
                             }
                         }
