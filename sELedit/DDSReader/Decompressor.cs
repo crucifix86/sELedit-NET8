@@ -7,6 +7,12 @@ namespace sELedit.DDSReader
 	{
 		internal static byte[] Expand(DDSStruct header, byte[] data, PixelFormat pixelFormat)
 		{
+			// Check for null data
+			if (data == null)
+			{
+				throw new ArgumentNullException(nameof(data), "DDS data is null");
+			}
+			
 			// allocate bitmap
 			byte[] rawData = null;
 
@@ -267,6 +273,12 @@ namespace sELedit.DDSReader
 
 		private static byte[] DecompressDXT4(DDSStruct header, byte[] data, PixelFormat pixelFormat)
 		{
+			// Check for null data
+			if (data == null || data.Length == 0)
+			{
+				throw new ArgumentNullException(nameof(data), "DDS data is null or empty");
+			}
+			
 			// allocate bitmap
 			int width = (int)header.width;
 			int height = (int)header.height;
@@ -282,6 +294,12 @@ namespace sELedit.DDSReader
 
 		private static unsafe byte[] DecompressDXT5(DDSStruct header, byte[] data, PixelFormat pixelFormat)
 		{
+			// Check for null data
+			if (data == null || data.Length == 0)
+			{
+				throw new ArgumentNullException(nameof(data), "DDS data is null or empty");
+			}
+			
 			// allocate bitmap
 			int bpp = (int)(Helper.PixelFormatToBpp(pixelFormat, header.pixelformat.rgbbitcount));
 			int bps = (int)(header.width * bpp * Helper.PixelFormatToBpc(pixelFormat));
@@ -289,6 +307,16 @@ namespace sELedit.DDSReader
 			int width = (int)header.width;
 			int height = (int)header.height;
 			int depth = (int)header.depth;
+
+			// Calculate expected data size (16 bytes per 4x4 block for DXT5)
+			int blockCountX = (width + 3) / 4;
+			int blockCountY = (height + 3) / 4;
+			int expectedSize = blockCountX * blockCountY * 16 * depth;
+			
+			if (data.Length < expectedSize)
+			{
+				throw new ArgumentException($"DDS data is too small. Expected at least {expectedSize} bytes, but got {data.Length} bytes", nameof(data));
+			}
 
 			byte[] rawData = new byte[depth * sizeofplane + height * bps + width * bpp];
 			Colour8888[] colours = new Colour8888[4];

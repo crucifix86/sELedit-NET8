@@ -493,7 +493,18 @@ namespace sELedit
                     byte[] array_IMG = ((IEnumerable<byte>)pck.ReadFile(pck.PckFile, source_img.ElementAt<PCKFileEntry>(0))).ToArray<byte>();
                     
                     DDSReader.Utils.PixelFormat sti = (DDSReader.Utils.PixelFormat)DDSFORMAT;
-                    Bitmap bmp2 = DDSReader.DDS.LoadImage(array_IMG, true, sti);
+                    Bitmap bmp2 = null;
+                    
+                    try
+                    {
+                        bmp2 = DDSReader.DDS.LoadImage(array_IMG, true, sti);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log DDS loading error
+                        System.Diagnostics.Debug.WriteLine($"Failed to load DDS image: {ex.Message}");
+                        // Continue without the image
+                    }
 
                     if (bmp2 != null)
                     {

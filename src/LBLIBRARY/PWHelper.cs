@@ -67,10 +67,24 @@
 
         public static Bitmap LoadDDSImage(byte[] ByteArray)
         {
-            using (MemoryStream memoryStream = new MemoryStream(ByteArray))
+            try
             {
-                Bitmap bitmap = DDS.LoadImage(memoryStream);
-                return bitmap;
+                if (ByteArray == null || ByteArray.Length == 0)
+                {
+                    System.Diagnostics.Debug.WriteLine("LoadDDSImage: ByteArray is null or empty");
+                    return null;
+                }
+                
+                using (MemoryStream memoryStream = new MemoryStream(ByteArray))
+                {
+                    Bitmap bitmap = DDS.LoadImage(memoryStream);
+                    return bitmap;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"LoadDDSImage failed: {ex.Message}");
+                return null;
             }
         }
 
@@ -78,6 +92,11 @@
         {
             Func<PCKFileEntry, bool> predicate = d => d.Path == @"surfaces\iconset\iconlist_ivtrm.dds";
             Bitmap img = LoadDDSImage(pck.ReadFile(pck.PckFile, pck.Files.Where<PCKFileEntry>(predicate).ElementAt<PCKFileEntry>(0)).ToArray<byte>());
+            if (img == null)
+            {
+                System.Diagnostics.Debug.WriteLine("LoadIconList: Failed to load DDS image");
+                return new List<Icon>();
+            }
             return LoadIconList(el, img, CreateLines(pck));
         }
 
@@ -86,6 +105,11 @@
             ArchiveEngine pck = new ArchiveEngine(PckPath);
             Func<PCKFileEntry, bool> predicate = d => d.Path == @"surfaces\iconset\iconlist_ivtrm.dds";
             Bitmap img = LoadDDSImage(pck.ReadFile(pck.PckFile, pck.Files.Where<PCKFileEntry>(predicate).ElementAt<PCKFileEntry>(0)).ToArray<byte>());
+            if (img == null)
+            {
+                System.Diagnostics.Debug.WriteLine("LoadIconList: Failed to load DDS image from PCK");
+                return new List<Icon>();
+            }
             return LoadIconList(el, img, CreateLines(pck));
         }
 
